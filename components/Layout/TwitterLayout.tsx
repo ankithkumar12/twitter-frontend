@@ -1,6 +1,6 @@
 import { useCurrentUser } from "@/hooks/user";
 import { useQueryClient } from "@tanstack/react-query";
-import React, { useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { BsPeople } from "react-icons/bs";
 import { CiCircleMore, CiMail, CiUser } from "react-icons/ci";
 import { FaXTwitter } from "react-icons/fa6";
@@ -11,50 +11,62 @@ import { toast } from "react-hot-toast";
 import { graphqlClient } from "@/clients/api";
 import { verifyUserGoogleTokenQuery } from "@/graphql/query/user";
 import Image from "next/image";
+import Link from "next/link";
 
 interface TwitterLayoutProps {
   children: React.ReactNode;
 }
 
 export const TwitterLayout: React.FC<TwitterLayoutProps> = (props) => {
+  const { user } = useCurrentUser();
+  const queryClient = useQueryClient();
+
   interface TwitterSideBarItem {
     title: String;
     icon: React.ReactNode;
+    link: string;
   }
 
-  const sideBarItems: TwitterSideBarItem[] = [
-    {
-      title: "Home",
-      icon: <FaXTwitter size={20} />,
-    },
-    {
-      title: "Explore",
-      icon: <IoSearchOutline />,
-    },
-    {
-      title: "Notifications",
-      icon: <GoBell />,
-    },
-    {
-      title: "Messages",
-      icon: <CiMail />,
-    },
-    {
-      title: "Communities",
-      icon: <BsPeople />,
-    },
-    {
-      title: "Profile",
-      icon: <CiUser />,
-    },
-    {
-      title: "More",
-      icon: <CiCircleMore />,
-    },
-  ];
-
-  const { user } = useCurrentUser();
-  const queryClient = useQueryClient();
+  const sideBarItems: TwitterSideBarItem[] = useMemo(
+    () => [
+      {
+        title: "Home",
+        icon: <FaXTwitter size={20} />,
+        link: "/",
+      },
+      {
+        title: "Explore",
+        icon: <IoSearchOutline />,
+        link: "/",
+      },
+      {
+        title: "Notifications",
+        icon: <GoBell />,
+        link: "/",
+      },
+      {
+        title: "Messages",
+        icon: <CiMail />,
+        link: "/",
+      },
+      {
+        title: "Communities",
+        icon: <BsPeople />,
+        link: "/",
+      },
+      {
+        title: "Profile",
+        icon: <CiUser />,
+        link: `/${user?.id}`,
+      },
+      {
+        title: "More",
+        icon: <CiCircleMore />,
+        link: "/",
+      },
+    ],
+    [user?.id]
+  );
 
   const handleLoginWithGoogle = useCallback(
     async (cred: CredentialResponse) => {
@@ -97,9 +109,14 @@ export const TwitterLayout: React.FC<TwitterLayoutProps> = (props) => {
                     key={index}
                     className=" hover:bg-gray-800 rounded-full w-fit  mt-2"
                   >
-                    <li className="flex gap-2 justify-start items-center mr-4 ml-2 py-2 cursor-pointer transition-all">
-                      <span>{item.icon}</span>
-                      <span className="hidden md:block">{item.title}</span>
+                    <li className="">
+                      <Link
+                        href={item.link}
+                        className="flex gap-2 justify-start items-center mr-4 ml-2 py-2 cursor-pointer transition-all"
+                      >
+                        <span>{item.icon}</span>
+                        <span className="hidden md:block">{item.title}</span>
+                      </Link>
                     </li>
                   </div>
                 ))}
@@ -108,8 +125,6 @@ export const TwitterLayout: React.FC<TwitterLayoutProps> = (props) => {
               <button className="hidden md:block bg-[#1d9bf0] rounded-full  md:px-10 lg:px-20 py-2 mt-2 cursor-pointer">
                 Post
               </button>
-
-          
 
               {user && (
                 <div className="absolute bottom-5 flex gap-2 items-center  cursor-pointer hover:bg-slate-800 sm:px-3 py-2 rounded-full overflow-clip">
@@ -127,7 +142,9 @@ export const TwitterLayout: React.FC<TwitterLayoutProps> = (props) => {
                       <p className="overflow-hidden hidden  lg:block w-[125px]">
                         {user.firstName}
                       </p>
-                      <p>{user.lastName}</p>
+                      <p className="overflow-hidden hidden  lg:block w-[125px]">
+                        {user.lastName}
+                      </p>
                     </div>
                   </div>
                 </div>
