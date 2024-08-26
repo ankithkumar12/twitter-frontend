@@ -10,6 +10,8 @@ import {
 } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
+
+
 export const useCreateTweet = () => {
   const queryClient = useQueryClient();
   const mutation = useMutation({
@@ -26,6 +28,9 @@ export const useCreateTweet = () => {
 
   return mutation;
 };
+
+
+
 export const useGetAllTweets = () => {
   const query = useQuery({
     queryKey: ["all-tweets"],

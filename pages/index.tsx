@@ -84,6 +84,7 @@ export default function Home(props: ServerProps) {
     mutate({
       content,
       imageUrl: imageURL,
+      
     });
 
     const refreshData = async() => {
