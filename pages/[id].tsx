@@ -11,14 +11,46 @@ import { useRouter } from "next/router";
 import { graphqlClient } from "@/clients/api";
 import { getUserByIDQuery } from "@/graphql/query/user";
 import toast from "react-hot-toast";
+import { useCallback, useMemo } from "react";
+import { useQueryClient } from "@tanstack/react-query";
+import {
+  followUserMutation,
+  unfollowUserMutation,
+} from "@/graphql/mutations/user";
 
 interface ServerProps {
   user?: User;
 }
 
 const UserProfilePage: NextPage<ServerProps> = (props) => {
-  // const { user } = useCurrentUser();
+  const { user: currentUser } = useCurrentUser();
+  const queryClient = useQueryClient();
   const router = useRouter();
+  console.log(router.query.id);
+
+  const amIFollowing = useMemo(() => {
+    if (!props.user) return false;
+    return (
+      (currentUser?.following?.findIndex((el) => el?.id === props.user?.id) ??
+        -1) >= 0
+    );
+  }, [currentUser?.following, props.user]);
+
+  const handleFollowUser = useCallback(async () => {
+    if (!props.user?.id) return;
+
+    await graphqlClient.request(followUserMutation, { to: props.user?.id });
+    await queryClient.invalidateQueries(["curent-user"]);
+  }, [props.user?.id, queryClient]);
+
+  const handleUnfollowUser = useCallback(async () => {
+    if (!props.user?.id) return;
+
+    await graphqlClient.request(unfollowUserMutation, {
+      to: props.user?.id,
+    });
+    await queryClient.invalidateQueries(["curent-user"]);
+  }, [props.user?.id, queryClient]);
 
   return (
     <div>
@@ -48,10 +80,42 @@ const UserProfilePage: NextPage<ServerProps> = (props) => {
                 className="rounded-full"
               />
 
-              <div className="p-2">
-                <h1 className="text-xl">{props.user.firstName} </h1>
-                <h1 className="text-xl">{props.user.lastName} </h1>
+              <div className="p-3">
+                <div className="flex gap-1">
+                  <h1 className="text-xl">{props.user.firstName} </h1>
+                  <h1 className="text-xl">{props.user.lastName} </h1>
+                </div>
                 <h3 className="text-xs text-slate-500">{props.user.email}</h3>
+              </div>
+
+              <div className="flex px-3 justify-between items-center">
+                <div className="flex gap-2  text-slate-500">
+                  <h1 className="text-sm">
+                    {props.user.followers?.length} Followers{" "}
+                  </h1>
+                  <h1 className="text-sm">
+                    {props.user.following?.length} Following
+                  </h1>
+                </div>
+                {currentUser?.id !== props.user?.id && (
+                  <>
+                    {amIFollowing ? (
+                      <button
+                        onClick={handleUnfollowUser}
+                        className="bg-white text-black px-3 py-1 rounded-full text-sm"
+                      >
+                        Unfollow
+                      </button>
+                    ) : (
+                      <button
+                        onClick={handleFollowUser}
+                        className="bg-white text-black px-3 py-1 rounded-full text-sm"
+                      >
+                        Follow
+                      </button>
+                    )}
+                  </>
+                )}
               </div>
             </div>
           )}

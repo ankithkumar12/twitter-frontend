@@ -99,7 +99,7 @@ export const TwitterLayout: React.FC<TwitterLayoutProps> = (props) => {
         <div className="grid grid-cols-12 h-screen w-screen sm:px-12">
           <div className=" col-span-1 sm:col-span-2 md:col-span-3">
             <div className="mt-1  hover:bg-gray-800 rounded-full w-fit sm:ml-3">
-              <FaXTwitter className="text-5xl p-2 object-contain cursor-pointer transition-all" />
+              <FaXTwitter className="text-4xl md:text-5xl p-2 object-contain cursor-pointer transition-all" />
             </div>
 
             <div className="icon-List   sm:px-2  lg:px-4 mt-4 font-normal lg:text-2xl ">
@@ -130,7 +130,7 @@ export const TwitterLayout: React.FC<TwitterLayoutProps> = (props) => {
                 <div className="absolute bottom-5 flex gap-2 items-center  cursor-pointer hover:bg-slate-800 sm:px-3 py-2 rounded-full overflow-clip">
                   {user && user.profileImageURL! && (
                     <Image
-                      className="rounded-full"
+                      className="hidden md:block rounded-full"
                       src={user?.profileImageURL}
                       alt="user-image"
                       height={40}
