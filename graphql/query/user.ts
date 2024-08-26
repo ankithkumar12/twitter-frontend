@@ -21,6 +21,12 @@ export const getCurrentUserQuery = graphql(`
       following {
         id
       }
+      recommendedUsers {
+        id
+        firstName
+        lastName
+        profileImageURL
+      }
       tweets {
         imageUrl
         id
