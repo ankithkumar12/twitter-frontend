@@ -16,3 +16,10 @@ export const getAllTweetsQuery = graphql(`
     }
   }
 `);
+
+export const getSignedURLQuery = graphql(`
+  #graphql
+  query Query($imageType: String!, $imageName: String!) {
+    getSignedURL(imageType: $imageType, imageName: $imageName)
+  }
+`);

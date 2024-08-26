@@ -37,6 +37,15 @@ const FeedCard: React.FC<FeedCardProps> = (props) => {
             </h5>
           </Link>
           <p>{data.content}</p>
+          {data.imageUrl && (
+            <Image
+              className="mt-2"
+              src={data.imageUrl}
+              alt="image"
+              height={400}
+              width={400}
+            />
+          )}
           <div className="flex items-center justify-between mt-2 mb-2">
             <div className="hover:bg-sky-950 rounded-full cursor-pointer">
               <FiMessageCircle className=" text-lg " />
