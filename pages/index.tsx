@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { Tweet } from "@/gql/graphql";
 import { useCreateTweet, useGetAllTweets } from "@/hooks/tweet";
@@ -14,16 +14,16 @@ import { graphqlClient } from "@/clients/api";
 import { getAllTweetsQuery, getSignedURLQuery } from "@/graphql/query/tweet";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { headers } from "next/dist/client/components/headers";
 
 interface ServerProps {
   tweets: Tweet[];
 }
 
 export default function Home(props: ServerProps) {
-  const router = useRouter();
-  const { mutate } = useCreateTweet();
+  const { mutateAsync } = useCreateTweet();
   const { user } = useCurrentUser();
+
+  const { tweets = props.tweets as Tweet[] } = useGetAllTweets();
 
   const [content, setContent] = useState("");
   const [imageURL, setImageURL] = useState("");
@@ -80,20 +80,14 @@ export default function Home(props: ServerProps) {
 
   console.log(user);
 
-  const handlePostCreation = useCallback(() => {
-    mutate({
+  const handlePostCreation = useCallback(async () => {
+    await mutateAsync({
       content,
       imageUrl: imageURL,
-      
     });
-
-    const refreshData = async() => {
-      await router.replace(router.asPath);
-    };
-
-    refreshData();
-    
-  }, [mutate, content, imageURL, router]);
+    setContent("");
+    setImageURL("");
+  }, [mutateAsync, content, imageURL]);
 
   return (
     <div>
@@ -151,7 +145,7 @@ export default function Home(props: ServerProps) {
             </div>
           </div>
         </div>
-        {props.tweets?.map((tweet) =>
+        {tweets?.map((tweet) =>
           tweet ? <FeedCard key={tweet?.id} data={tweet as Tweet} /> : null
         )}
       </TwitterLayout>
